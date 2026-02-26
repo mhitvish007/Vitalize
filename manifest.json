@@ -1,0 +1,31 @@
+{
+  "name": "Vitalize Health Tracker",
+  "short_name": "Vitalize",
+  "description": "Track steps, daily goals and stay healthy with your group",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0f0a",
+  "theme_color": "#7fff6a",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='40' fill='%230a0f0a'/><text y='130' x='20' font-size='120'>🌿</text></svg>",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='100' fill='%230a0f0a'/><text y='360' x='40' font-size='320'>🌿</text></svg>",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
+    }
+  ],
+  "categories": ["health", "fitness", "lifestyle"],
+  "shortcuts": [
+    {
+      "name": "Log Steps",
+      "short_name": "Steps",
+      "url": "/?action=steps",
+      "description": "Quickly log your steps"
+    }
+  ]
+}

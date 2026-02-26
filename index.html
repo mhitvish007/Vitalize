@@ -1,0 +1,1252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#ffffff">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Vitalize">
+<title>Vitalize — Health Tracker</title>
+<link rel="manifest" href="/manifest.json">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#f5f7f5;--surface:#ffffff;--surface2:#f0f4f0;--surface3:#e8ede8;
+  --accent:#2d9e2d;--accent2:#3dbf3d;--accent-light:#e8f5e8;--accent-dim:#c8e6c8;
+  --text:#1a2e1a;--text-dim:#4a6e4a;--text-muted:#8aaa8a;
+  --danger:#e53e3e;--gold:#d4a017;--gold-light:#fef9e7;--blue:#2563eb;--purple:#7c3aed;
+  --border:#e2ebe2;--border2:#d4e4d4;--r:14px;
+  --shadow:0 1px 3px rgba(0,0,0,0.08),0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md:0 4px 12px rgba(0,0,0,0.1);
+  --safe-top:env(safe-area-inset-top,0px);--safe-bot:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;overflow-x:hidden;padding-bottom:calc(72px + var(--safe-bot))}
+
+.app{max-width:480px;margin:0 auto;padding:0 14px}
+
+/* TOPBAR */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:calc(var(--safe-top) + 14px) 0 12px;position:sticky;top:0;z-index:50;background:rgba(245,247,245,0.95);backdrop-filter:blur(10px)}
+.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:20px;color:var(--accent)}
+.logo em{color:var(--text-muted);font-style:normal;font-weight:400;font-size:11px;margin-left:2px}
+.topbar-right{display:flex;align-items:center;gap:7px}
+.user-pill{display:flex;align-items:center;gap:7px;background:var(--surface);border:1.5px solid var(--border2);border-radius:40px;padding:5px 12px 5px 5px;cursor:pointer;box-shadow:var(--shadow)}
+.user-pill:active{background:var(--surface2)}
+.avatar{width:28px;height:28px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:11px;flex-shrink:0}
+.avatar.md{width:36px;height:36px;font-size:13px}
+.avatar.lg{width:46px;height:46px;font-size:17px}
+.uname{font-size:13px;font-weight:600;color:var(--text);max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.icon-btn{width:36px;height:36px;border-radius:10px;background:var(--surface);border:1.5px solid var(--border2);color:var(--text-dim);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:17px;box-shadow:var(--shadow);flex-shrink:0}
+.icon-btn:active{background:var(--surface2)}
+
+/* CARDS */
+.card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:12px;box-shadow:var(--shadow)}
+.card.green-card{background:linear-gradient(135deg,var(--accent) 0%,var(--accent2) 100%);border-color:transparent;color:#fff}
+.card.gold-card{background:linear-gradient(135deg,#f59e0b,#d4a017);border-color:transparent;color:#fff}
+.card.purple-card{background:linear-gradient(135deg,#7c3aed,#9f5af0);border-color:transparent;color:#fff}
+.card.soft-green{background:var(--accent-light);border-color:var(--accent-dim)}
+
+/* SEC */
+.sec{font-family:'Syne',sans-serif;font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:2px;color:var(--text-muted);margin-bottom:10px}
+.flex-between{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+
+/* INPUTS */
+.input{background:var(--surface2);border:1.5px solid var(--border);color:var(--text);border-radius:10px;padding:10px 12px;font-family:'DM Sans',sans-serif;font-size:14px;outline:none;transition:border-color 0.2s;-webkit-appearance:none;width:100%}
+.input:focus{border-color:var(--accent);background:var(--surface)}
+.input::placeholder{color:var(--text-muted)}
+select.input{cursor:pointer}
+.btn{background:var(--accent);color:#fff;border:none;border-radius:10px;padding:11px 16px;font-family:'Syne',sans-serif;font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap;transition:all 0.15s;box-shadow:0 2px 8px rgba(45,158,45,0.3)}
+.btn:active{transform:scale(0.96)}
+.btn.sm{padding:8px 12px;font-size:11px;border-radius:9px;box-shadow:none}
+.btn.xs{padding:5px 9px;font-size:10px;border-radius:7px;box-shadow:none}
+.btn.ghost{background:var(--surface);color:var(--text-dim);border:1.5px solid var(--border);box-shadow:none}
+.btn.ghost:active{background:var(--surface2)}
+.btn.gold{background:linear-gradient(135deg,#f59e0b,#d4a017);color:#fff;box-shadow:0 2px 8px rgba(245,158,11,0.3)}
+.btn.purple{background:linear-gradient(135deg,#7c3aed,#9f5af0);color:#fff;box-shadow:0 2px 8px rgba(124,58,237,0.3)}
+.btn.danger{background:var(--danger);color:#fff;box-shadow:none}
+.btn.white{background:#fff;color:var(--accent);box-shadow:none}
+.log-row{display:flex;gap:7px}
+.tag{display:inline-block;background:var(--accent-light);color:var(--accent);border-radius:5px;padding:2px 7px;font-size:9px;font-weight:700;border:1px solid var(--accent-dim)}
+.tag.gold-tag{background:var(--gold-light);color:var(--gold);border-color:#fde68a}
+.tag.purple-tag{background:#f3e8ff;color:var(--purple);border-color:#ddd6fe}
+.tag.blue-tag{background:#eff6ff;color:var(--blue);border-color:#bfdbfe}
+.empty{text-align:center;padding:24px 0;font-size:13px;color:var(--text-muted)}
+
+/* STEPS HERO */
+.steps-hero-card{background:linear-gradient(135deg,var(--accent) 0%,#27a827 100%);border-radius:var(--r);padding:18px;margin-bottom:12px;color:#fff;box-shadow:0 4px 20px rgba(45,158,45,0.35)}
+.steps-top{display:flex;align-items:center;gap:14px;margin-bottom:14px}
+.steps-ring-wrap{position:relative;width:84px;height:84px;flex-shrink:0}
+.steps-ring-wrap svg{transform:rotate(-90deg)}
+.ring-bg{fill:none;stroke:rgba(255,255,255,0.2);stroke-width:8}
+.ring-fill{fill:none;stroke:#fff;stroke-width:8;stroke-linecap:round;stroke-dasharray:251;stroke-dashoffset:251;transition:stroke-dashoffset 0.9s cubic-bezier(0.34,1.56,0.64,1)}
+.steps-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.steps-num{font-family:'Syne',sans-serif;font-weight:800;font-size:18px;color:#fff;line-height:1}
+.steps-unit{font-size:8px;color:rgba(255,255,255,0.7)}
+.steps-info{flex:1}
+.steps-goal-txt{font-size:13px;color:rgba(255,255,255,0.85);margin-bottom:4px}
+.steps-goal-txt strong{color:#fff;font-weight:700}
+.steps-pct-txt{font-size:11px;color:rgba(255,255,255,0.7);margin-bottom:10px}
+.prog-wrap{background:rgba(255,255,255,0.25);border-radius:99px;height:5px;overflow:hidden;margin-bottom:10px}
+.prog-fill{height:100%;border-radius:99px;background:#fff;transition:width 0.7s}
+.prog-wrap.dark{background:var(--surface3)}
+.prog-fill.dark{background:linear-gradient(90deg,var(--accent),var(--accent2))}
+.steps-log-row{display:flex;gap:7px}
+.input-white{flex:1;background:rgba(255,255,255,0.2);border:1.5px solid rgba(255,255,255,0.35);color:#fff;border-radius:10px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;-webkit-appearance:none}
+.input-white::placeholder{color:rgba(255,255,255,0.6)}
+.input-white:focus{background:rgba(255,255,255,0.3);border-color:rgba(255,255,255,0.6)}
+.goal-row-box{margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.2)}
+
+/* MINI STATS */
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.stat-box{background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:12px 8px;text-align:center;box-shadow:var(--shadow)}
+.stat-val{font-family:'Syne',sans-serif;font-weight:800;font-size:20px;color:var(--text)}
+.stat-val.green{color:var(--accent)}.stat-val.gold{color:var(--gold)}.stat-val.blue{color:var(--blue)}
+.stat-lbl{font-size:9px;color:var(--text-muted);margin-top:2px;text-transform:uppercase;letter-spacing:1px}
+
+/* WEEK */
+.week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.day-col{display:flex;flex-direction:column;align-items:center;gap:4px}
+.day-lbl{font-size:8px;color:var(--text-muted);text-transform:uppercase;font-weight:700}
+.day-bar-track{width:100%;height:52px;background:var(--surface2);border-radius:5px;display:flex;align-items:flex-end;overflow:hidden}
+.day-bar{width:100%;border-radius:5px 5px 0 0;background:linear-gradient(180deg,var(--accent2),var(--accent));transition:height 0.6s cubic-bezier(0.34,1.56,0.64,1);min-height:2px}
+.day-bar.hit{background:linear-gradient(180deg,#fbbf24,var(--gold))}
+.day-num{font-size:7px;color:var(--text-muted)}
+.day-col.is-today .day-lbl{color:var(--accent);font-weight:800}
+
+/* GOALS */
+.goals-list{display:flex;flex-direction:column;gap:7px}
+.goal-row{display:flex;align-items:center;gap:9px;background:var(--surface);border:1.5px solid var(--border);border-radius:11px;padding:11px 12px;transition:all 0.2s;box-shadow:var(--shadow)}
+.goal-row.checked{border-color:var(--accent-dim);background:var(--accent-light)}
+.check-box{width:22px;height:22px;border-radius:6px;border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;color:transparent;font-size:12px;background:var(--surface2);transition:all 0.15s}
+.goal-row.checked .check-box{border-color:var(--accent);background:var(--accent);color:#fff}
+.goal-text{flex:1;font-size:13px;line-height:1.3;color:var(--text)}
+.goal-row.checked .goal-text{color:var(--text-muted);text-decoration:line-through}
+.goal-streak{font-size:10px;color:var(--gold)}
+.del-btn{background:none;border:none;color:var(--text-muted);font-size:16px;cursor:pointer;padding:2px;line-height:1}
+.del-btn:active{color:var(--danger)}
+
+/* CALENDAR */
+.cal-header{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-top:8px}
+.cal-h{font-size:8px;text-align:center;color:var(--text-muted);font-weight:700;text-transform:uppercase;padding:2px 0}
+.month-cal{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-top:2px}
+.cal-day{aspect-ratio:1;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;color:var(--text-muted);background:var(--surface2)}
+.cal-day.all-done{background:var(--accent);color:#fff}
+.cal-day.partial{background:var(--accent-dim);color:var(--accent)}
+.cal-day.none-done{background:var(--surface3)}
+.cal-day.is-today{outline:2px solid var(--accent);outline-offset:1px}
+.cal-day.future{opacity:0.3}
+
+/* GROUPS */
+.group-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:10px;cursor:pointer;box-shadow:var(--shadow);transition:all 0.2s}
+.group-card:active{background:var(--surface2)}
+.group-card.has-challenge{border-left:4px solid var(--purple)}
+.group-card-header{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.group-icon{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;background:var(--surface2)}
+.group-name{font-family:'Syne',sans-serif;font-weight:700;font-size:15px;color:var(--text)}
+.group-meta{font-size:10px;color:var(--text-muted);margin-top:2px}
+.group-stats{display:flex;gap:10px;flex-wrap:wrap}
+.group-stat{font-size:11px;color:var(--text-dim)}
+.group-stat strong{color:var(--text);font-weight:600}
+.invite-code-box{font-family:monospace;font-size:22px;font-weight:800;color:var(--accent);letter-spacing:5px;background:var(--accent-light);border:1.5px dashed var(--accent-dim);border-radius:10px;padding:12px;text-align:center;margin:10px 0}
+.back-btn{display:flex;align-items:center;gap:6px;color:var(--text-dim);font-size:13px;cursor:pointer;margin-bottom:14px;font-weight:500}
+.back-btn:active{color:var(--accent)}
+
+/* CHALLENGE */
+.challenge-card{background:linear-gradient(135deg,#f3e8ff,#ede9fe);border:1.5px solid #ddd6fe;border-radius:var(--r);padding:14px;margin-bottom:12px}
+.challenge-title{font-family:'Syne',sans-serif;font-weight:700;font-size:14px;color:var(--purple);margin-bottom:3px}
+.challenge-meta{font-size:11px;color:#6d28d9;margin-bottom:6px}
+.challenge-prize{font-size:12px;color:var(--gold);font-weight:600;margin-bottom:10px}
+.ch-member-row{display:flex;align-items:center;gap:8px;margin-bottom:5px}
+.ch-name{font-size:12px;color:var(--text);width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex-shrink:0;font-weight:500}
+.ch-bar-wrap{flex:1;background:#ede9fe;border-radius:99px;height:6px;overflow:hidden}
+.ch-bar{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--purple),#a78bfa);transition:width 0.5s}
+.ch-val{font-size:10px;color:#6d28d9;width:36px;text-align:right;flex-shrink:0;font-weight:600}
+
+/* CHAT */
+.chat-area{height:240px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding:4px 2px;margin-bottom:10px}
+.chat-msg{max-width:78%}
+.chat-msg.mine{align-self:flex-end}
+.chat-msg.theirs{align-self:flex-start}
+.chat-bubble{padding:9px 13px;border-radius:16px;font-size:13px;line-height:1.4}
+.chat-msg.mine .chat-bubble{background:var(--accent);color:#fff;border-bottom-right-radius:4px}
+.chat-msg.theirs .chat-bubble{background:var(--surface2);color:var(--text);border-bottom-left-radius:4px;border:1px solid var(--border)}
+.chat-sender{font-size:9px;color:var(--text-muted);margin-bottom:2px;font-weight:600}
+.chat-msg.mine .chat-sender{text-align:right}
+.chat-time{font-size:8px;color:var(--text-muted);margin-top:3px}
+.chat-msg.mine .chat-time{text-align:right}
+.chat-input-row{display:flex;gap:7px;align-items:flex-end}
+.chat-input{flex:1;background:var(--surface2);border:1.5px solid var(--border);color:var(--text);border-radius:18px;padding:9px 14px;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;resize:none}
+.chat-input:focus{border-color:var(--accent);background:var(--surface)}
+.chat-input::placeholder{color:var(--text-muted)}
+.chat-send{width:38px;height:38px;border-radius:50%;background:var(--accent);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;color:#fff;flex-shrink:0;box-shadow:0 2px 8px rgba(45,158,45,0.3)}
+.chat-send:active{transform:scale(0.92)}
+
+/* LEADERBOARD */
+.lb-row{display:flex;align-items:center;gap:9px;padding:10px 0;border-bottom:1.5px solid var(--border);cursor:pointer}
+.lb-row:last-child{border-bottom:none}
+.lb-row:active{background:var(--surface2);border-radius:8px;padding-left:6px;padding-right:6px}
+.rank{font-family:'Syne',sans-serif;font-weight:800;font-size:14px;color:var(--text-muted);width:20px;text-align:center;flex-shrink:0}
+.rank.top{color:var(--gold)}
+.mb-info{flex:1;min-width:0}
+.mb-name{font-size:13px;font-weight:600;color:var(--text)}
+.mb-email{font-size:9px;color:var(--text-muted)}
+.mb-steps{font-family:'Syne',sans-serif;font-weight:800;font-size:15px;color:var(--accent);flex-shrink:0}
+.mb-del{background:none;border:none;color:var(--text-muted);font-size:16px;cursor:pointer;padding:4px}
+.mb-del:active{color:var(--danger)}
+
+/* COMPARE */
+.compare-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.cmp-col{display:flex;flex-direction:column;align-items:center;gap:3px}
+.cmp-lbl{font-size:7px;color:var(--text-muted);text-transform:uppercase;font-weight:700}
+.cmp-track{width:100%;height:52px;background:var(--surface2);border-radius:5px;display:flex;flex-direction:column;justify-content:flex-end;overflow:hidden;gap:1px}
+.cmp-bar{width:100%;min-height:2px;transition:height 0.5s}
+.cmp-legend{display:flex;gap:8px;flex-wrap:wrap;margin-top:7px}
+.cmp-leg-item{display:flex;align-items:center;gap:3px;font-size:10px;color:var(--text-dim)}
+.cmp-leg-dot{width:8px;height:8px;border-radius:2px}
+.c0{background:#2d9e2d}.c1{background:#2563eb}.c2{background:#d4a017}.c3{background:#e53e3e}.c4{background:#7c3aed}.c5{background:#0891b2}
+
+/* WINNER */
+.winner-banner{background:linear-gradient(135deg,#fef9e7,#fef3c7);border:1.5px solid #fde68a;border-radius:var(--r);padding:12px 14px;display:flex;align-items:center;gap:10px;margin-bottom:12px;box-shadow:0 2px 8px rgba(212,160,23,0.15)}
+.winner-title{font-family:'Syne',sans-serif;font-weight:700;font-size:13px;color:var(--gold)}
+.winner-sub{font-size:11px;color:#92400e;margin-top:1px}
+
+/* PROFILE */
+.profile-hero{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.profile-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.profile-stat{background:var(--surface2);border:1.5px solid var(--border);border-radius:11px;padding:10px;text-align:center}
+.profile-stat-val{font-family:'Syne',sans-serif;font-weight:700;font-size:18px}
+.profile-stat-lbl{font-size:8px;color:var(--text-muted);margin-top:2px;text-transform:uppercase;font-weight:600}
+.gcl-row{display:flex;align-items:center;gap:8px;padding:9px 11px;border-radius:10px;background:var(--surface2);border:1.5px solid var(--border);margin-bottom:6px}
+.gcl-row.done{border-color:var(--accent-dim);background:var(--accent-light)}
+.gcl-dot{width:17px;height:17px;border-radius:5px;border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;color:transparent;background:var(--surface)}
+.gcl-row.done .gcl-dot{border-color:var(--accent);background:var(--accent);color:#fff}
+.gcl-txt{font-size:13px;flex:1;color:var(--text)}
+.gcl-row.done .gcl-txt{color:var(--text-muted);text-decoration:line-through}
+
+/* ADMIN MEMBER ROW */
+.admin-member-row{display:flex;align-items:center;gap:9px;padding:9px 0;border-bottom:1px solid var(--border)}
+.admin-member-row:last-child{border-bottom:none}
+
+/* REMINDER */
+.reminder-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)}
+.reminder-row:last-child{border-bottom:none}
+.toggle{position:relative;width:44px;height:24px;flex-shrink:0}
+.toggle input{opacity:0;width:0;height:0}
+.slider{position:absolute;cursor:pointer;inset:0;background:var(--surface3);border-radius:24px;transition:background 0.2s}
+.slider:before{content:'';position:absolute;height:18px;width:18px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:transform 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.2)}
+input:checked+.slider{background:var(--accent)}
+input:checked+.slider:before{transform:translateX(20px)}
+
+/* NAV */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:50;background:rgba(255,255,255,0.95);backdrop-filter:blur(20px);border-top:1.5px solid var(--border);display:flex;justify-content:space-around;align-items:center;padding:6px 0 calc(6px + var(--safe-bot));max-width:480px;margin:0 auto}
+.nav-item{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;padding:5px 14px;border-radius:10px;transition:all 0.15s;-webkit-user-select:none}
+.nav-item.active{background:var(--accent-light)}
+.nav-icon{font-size:20px;line-height:1}
+.nav-label{font-size:8px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);font-weight:700}
+.nav-item.active .nav-label{color:var(--accent)}
+
+/* PAGES */
+.page{display:none;padding-top:4px}
+.page.active{display:block}
+
+/* SHEETS */
+.overlay{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.4);backdrop-filter:blur(4px);display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.25s}
+.overlay.open{opacity:1;pointer-events:all}
+.sheet{background:var(--surface);border-radius:22px 22px 0 0;padding:0 16px calc(20px + var(--safe-bot));width:100%;max-width:480px;transform:translateY(100%);transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1);max-height:92vh;overflow-y:auto;box-shadow:0 -4px 30px rgba(0,0,0,0.15)}
+.overlay.open .sheet{transform:translateY(0)}
+.sheet-handle{width:40px;height:4px;background:var(--border);border-radius:2px;margin:12px auto 16px}
+.sheet-title{font-family:'Syne',sans-serif;font-weight:700;font-size:19px;margin-bottom:16px;color:var(--text)}
+.field{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
+.field label{font-size:12px;color:var(--text-dim);font-weight:600}
+.sheet-actions{display:flex;gap:8px;margin-top:6px}
+.sep{height:1.5px;background:var(--border);margin:14px 0}
+
+/* TOAST */
+.toast{position:fixed;bottom:calc(82px + var(--safe-bot));left:50%;transform:translateX(-50%) translateY(20px);background:var(--text);color:#fff;border-radius:10px;padding:10px 16px;font-size:12px;font-weight:500;opacity:0;transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1);z-index:999;white-space:nowrap;pointer-events:none;box-shadow:var(--shadow-md)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.share-url-box{background:var(--surface2);border:1.5px solid var(--border);border-radius:9px;padding:9px 12px;font-size:10px;color:var(--text-dim);font-family:monospace;word-break:break-all;margin-bottom:9px}
+.month-title{font-family:'Syne',sans-serif;font-size:12px;color:var(--text-muted)}
+</style>
+</head>
+<body>
+<div class="toast" id="toast"></div>
+<div class="app">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="logo">Vitalize <em>Health</em></div>
+    <div class="topbar-right">
+      <div class="user-pill" onclick="openSheet('sheetUser')">
+        <div class="avatar" id="topAvatar">?</div>
+        <span class="uname" id="topName">Select user</span>
+      </div>
+      <div class="icon-btn" onclick="openSheet('sheetAddMember')" title="Add member">＋</div>
+    </div>
+  </div>
+
+  <!-- HOME PAGE -->
+  <div class="page active" id="pageHome">
+
+    <!-- Winner Banner -->
+    <div class="winner-banner" id="winnerBanner" style="display:none">
+      <div style="font-size:26px">🏆</div>
+      <div><div class="winner-title" id="winnerTitle"></div><div class="winner-sub" id="winnerSub"></div></div>
+    </div>
+
+    <!-- Steps Hero Card -->
+    <div class="steps-hero-card">
+      <div class="steps-top">
+        <div class="steps-ring-wrap">
+          <svg width="84" height="84" viewBox="0 0 84 84">
+            <circle class="ring-bg" cx="42" cy="42" r="37"/>
+            <circle class="ring-fill" id="ringFill" cx="42" cy="42" r="37"/>
+          </svg>
+          <div class="steps-center"><div class="steps-num" id="stepsNum">0</div><div class="steps-unit">steps</div></div>
+        </div>
+        <div class="steps-info">
+          <div class="steps-goal-txt">Goal: <strong id="stepsGoalLbl">10,000</strong></div>
+          <div class="prog-wrap"><div class="prog-fill" id="stepsProgBar" style="width:0%"></div></div>
+          <div class="steps-pct-txt" id="stepsPctLbl">0% complete</div>
+          <div class="steps-log-row">
+            <input class="input-white" type="number" id="stepsInput" placeholder="Add steps…" min="0" inputmode="numeric">
+            <button class="btn white sm" onclick="logSteps()">Log</button>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;gap:7px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.2)">
+        <input class="input-white" type="number" id="goalInput" placeholder="Change daily goal…" min="100" inputmode="numeric" style="font-size:12px;padding:8px 11px">
+        <button class="btn white sm" onclick="setGoal()">Set Goal</button>
+      </div>
+    </div>
+
+    <!-- Stats Row -->
+    <div class="stats-row">
+      <div class="stat-box"><div class="stat-val gold" id="streakVal">0</div><div class="stat-lbl">🔥 Streak</div></div>
+      <div class="stat-box"><div class="stat-val green" id="weekVal">0</div><div class="stat-lbl">Week Steps</div></div>
+      <div class="stat-box"><div class="stat-val" id="goalsDoneVal">0/0</div><div class="stat-lbl">Goals Done</div></div>
+    </div>
+
+    <!-- Week Chart -->
+    <div class="card">
+      <div class="sec">This Week</div>
+      <div class="week-grid" id="weekGrid"></div>
+    </div>
+
+    <!-- TODAY'S GOALS on home page -->
+    <div class="card">
+      <div class="flex-between" style="margin-bottom:10px">
+        <div class="sec" style="margin:0">Today's Goals</div>
+        <button class="btn sm ghost" onclick="openSheet('sheetGoal')">＋ Add</button>
+      </div>
+      <div class="goals-list" id="homeGoalsList"></div>
+    </div>
+
+    <!-- Quick Group Overview -->
+    <div class="card" id="homeGroupsCard" style="display:none">
+      <div class="flex-between" style="margin-bottom:8px">
+        <div class="sec" style="margin:0">My Groups</div>
+        <button class="btn sm ghost" onclick="switchPage(2)">See All →</button>
+      </div>
+      <div id="homeGroupsPreview"></div>
+    </div>
+
+  </div><!-- /pageHome -->
+
+  <!-- GOALS PAGE -->
+  <div class="page" id="pageGoals">
+    <div class="flex-between" style="margin-top:4px">
+      <div><div class="sec" style="margin:0">Daily Goals</div><div class="month-title" id="monthTitle"></div></div>
+      <button class="btn sm" onclick="openSheet('sheetGoal')">＋ Goal</button>
+    </div>
+    <div class="card">
+      <div class="sec">Tick Off Today</div>
+      <div class="goals-list" id="goalsList"></div>
+    </div>
+    <div class="card">
+      <div class="sec">Monthly Progress</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:6px;font-size:10px;color:var(--text-muted)">
+        <span><span style="display:inline-block;width:9px;height:9px;background:var(--accent);border-radius:2px;vertical-align:middle;margin-right:3px"></span>All done</span>
+        <span><span style="display:inline-block;width:9px;height:9px;background:var(--accent-dim);border-radius:2px;vertical-align:middle;margin-right:3px"></span>Partial</span>
+        <span><span style="display:inline-block;width:9px;height:9px;background:var(--surface3);border-radius:2px;vertical-align:middle;margin-right:3px"></span>Missed</span>
+      </div>
+      <div class="cal-header" id="calHeader"></div>
+      <div class="month-cal" id="monthCal"></div>
+    </div>
+    <!-- Reminders -->
+    <div class="card">
+      <div class="sec">Daily Reminders</div>
+      <div id="remindersList"></div>
+      <button class="btn ghost sm" style="width:100%;margin-top:10px" onclick="openSheet('sheetReminder')">＋ Add Reminder</button>
+    </div>
+  </div>
+
+  <!-- GROUPS PAGE -->
+  <div class="page" id="pageGroups">
+    <div id="groupsListView">
+      <div class="flex-between" style="margin-top:4px">
+        <div class="sec" style="margin:0">My Groups</div>
+        <div style="display:flex;gap:6px">
+          <button class="btn ghost sm" onclick="openSheet('sheetJoinGroup')">🔑 Join</button>
+          <button class="btn sm" onclick="openSheet('sheetCreateGroup')">＋ Create</button>
+        </div>
+      </div>
+      <div id="groupsList"></div>
+    </div>
+    <div id="groupDetailView" style="display:none">
+      <div class="back-btn" onclick="closeGroupDetail()">← Back to Groups</div>
+      <div id="groupDetailContent"></div>
+    </div>
+  </div>
+
+  <!-- LEADERBOARD PAGE -->
+  <div class="page" id="pageLeaderboard">
+    <div class="flex-between" style="margin-top:4px">
+      <div class="sec" style="margin:0">Global Leaderboard · Today</div>
+      <button class="btn sm" onclick="openSheet('sheetAddMember')">＋ Member</button>
+    </div>
+    <div class="card" id="leaderboard"></div>
+    <div class="card">
+      <div class="sec">Weekly Comparison</div>
+      <div class="compare-grid" id="compareGrid"></div>
+      <div class="cmp-legend" id="cmpLegend"></div>
+    </div>
+    <div class="card soft-green">
+      <div class="sec">Share App</div>
+      <p style="font-size:12px;color:var(--text-dim);margin-bottom:10px;line-height:1.6">Share with friends — open the link and tap ＋ to join!</p>
+      <div class="share-url-box" id="shareUrlBox"></div>
+      <button class="btn" onclick="copyLink()" style="width:100%">📋 Copy App Link</button>
+    </div>
+  </div>
+
+</div><!-- /app -->
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <div class="nav-item active" id="nav0" onclick="switchPage(0)"><div class="nav-icon">🏠</div><div class="nav-label">Home</div></div>
+  <div class="nav-item" id="nav1" onclick="switchPage(1)"><div class="nav-icon">✅</div><div class="nav-label">Goals</div></div>
+  <div class="nav-item" id="nav2" onclick="switchPage(2)"><div class="nav-icon">👥</div><div class="nav-label">Groups</div></div>
+  <div class="nav-item" id="nav3" onclick="switchPage(3)"><div class="nav-icon">🏆</div><div class="nav-label">Board</div></div>
+</div>
+
+<!-- ===== SHEETS ===== -->
+
+<!-- Add Member -->
+<div class="overlay" id="sheetAddMember" onclick="sheetOutside(event,'sheetAddMember')">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">Add Member</div>
+    <div class="field"><label>Full Name</label><input class="input" id="mName" placeholder="e.g. Priya Sharma"></div>
+    <div class="field"><label>Email</label><input class="input" id="mEmail" type="email" placeholder="priya@example.com"></div>
+    <div class="sheet-actions">
+      <button class="btn" onclick="addMember()" style="flex:1">Add Member</button>
+      <button class="btn ghost" onclick="closeSheet('sheetAddMember')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Switch User -->
+<div class="overlay" id="sheetUser" onclick="sheetOutside(event,'sheetUser')">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">Switch Profile</div>
+    <div id="profileList" style="display:flex;flex-direction:column;gap:7px;margin-bottom:14px"></div>
+    <button class="btn ghost" onclick="closeSheet('sheetUser')" style="width:100%">Close</button>
+  </div>
+</div>
+
+<!-- Add Goal -->
+<div class="overlay" id="sheetGoal" onclick="sheetOutside(event,'sheetGoal')">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">New Daily Goal</div>
+    <div class="field"><label>Goal Description</label><input class="input" id="gText" placeholder="e.g. Drink 2L water, Meditate 10 min…"></div>
+    <div class="sheet-actions">
+      <button class="btn" onclick="addGoal()" style="flex:1">Add Goal</button>
+      <button class="btn ghost" onclick="closeSheet('sheetGoal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Create Group -->
+<div class="overlay" id="sheetCreateGroup" onclick="sheetOutside(event,'sheetCreateGroup')">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">Create Group</div>
+    <div class="field"><label>Group Name</label><input class="input" id="cgName" placeholder="e.g. Office Step Challenge"></div>
+    <div class="field"><label>Emoji Icon</label><input class="input" id="cgEmoji" placeholder="🏃" style="font-size:22px;text-align:center" maxlength="2"></div>
+    <div class="sep"></div>
+    <div class="sec">Challenge (Optional)</div>
+    <div class="field"><label>Challenge Name</label><input class="input" id="cgChallengeName" placeholder="e.g. 10k Steps for 7 Days"></div>
+    <div class="field"><label>Type</label>
+      <select class="input" id="cgChallengeType"><option value="steps">Most Steps Wins</option><option value="goals">All Goals Hit Daily</option></select>
+    </div>
+    <div class="field"><label>Duration (days)</label><input class="input" type="number" id="cgDays" placeholder="7" min="1" max="90" inputmode="numeric"></div>
+    <div class="field"><label>🏆 Prize / Reward</label><input class="input" id="cgPrize" placeholder="e.g. Dinner treat, Bragging rights…"></div>
+    <div class="sheet-actions">
+      <button class="btn" onclick="createGroup()" style="flex:1">Create Group</button>
+      <button class="btn ghost" onclick="closeSheet('sheetCreateGroup')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Join Group -->
+<div class="overlay" id="sheetJoinGroup" onclick="sheetOutside(event,'sheetJoinGroup')">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">Join a Group</div>
+    <p style="font-size:12px;color:var(--text-dim);margin-bottom:14px;line-height:1.6">Enter the 6-letter invite code, or ask the admin to share the group link with you — clicking that link adds you automatically!</p>
+    <div class="field"><label>Invite Code</label><input class="input" id="joinCode" placeholder="ABC123" style="font-size:22px;text-align:center;letter-spacing:5px;font-family:monospace;text-transform:uppercase"></div>
+    <div class="sheet-actions">
+      <button class="btn" onclick="joinGroup()" style="flex:1">Join Group</button>
+      <button class="btn ghost" onclick="closeSheet('sheetJoinGroup')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Reminder -->
+<div class="overlay" id="sheetReminder" onclick="sheetOutside(event,'sheetReminder')">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">Add Reminder</div>
+    <div class="field"><label>Reminder Label</label><input class="input" id="remLabel" placeholder="e.g. Log your steps, Check goals…"></div>
+    <div class="field"><label>Time</label><input class="input" type="time" id="remTime" value="08:00"></div>
+    <div class="field"><label>Days</label>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px" id="remDays">
+        <button class="btn ghost xs rem-day-btn active-day" data-day="0" onclick="toggleDay(this)">Su</button>
+        <button class="btn ghost xs rem-day-btn active-day" data-day="1" onclick="toggleDay(this)">Mo</button>
+        <button class="btn ghost xs rem-day-btn active-day" data-day="2" onclick="toggleDay(this)">Tu</button>
+        <button class="btn ghost xs rem-day-btn active-day" data-day="3" onclick="toggleDay(this)">We</button>
+        <button class="btn ghost xs rem-day-btn active-day" data-day="4" onclick="toggleDay(this)">Th</button>
+        <button class="btn ghost xs rem-day-btn active-day" data-day="5" onclick="toggleDay(this)">Fr</button>
+        <button class="btn ghost xs rem-day-btn active-day" data-day="6" onclick="toggleDay(this)">Sa</button>
+      </div>
+    </div>
+    <p style="font-size:11px;color:var(--text-muted);margin-bottom:12px;line-height:1.6">⚠️ Reminders work when the app is open or installed on your home screen. Tap Allow if your browser asks for notification permission.</p>
+    <div class="sheet-actions">
+      <button class="btn" onclick="addReminder()" style="flex:1">Set Reminder</button>
+      <button class="btn ghost" onclick="closeSheet('sheetReminder')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Member Profile -->
+<div class="overlay" id="sheetProfile" onclick="sheetOutside(event,'sheetProfile')">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div id="profileContent"></div>
+    <button class="btn ghost" onclick="closeSheet('sheetProfile')" style="width:100%;margin-top:12px">Close</button>
+  </div>
+</div>
+
+<!-- Group Admin Panel -->
+<div class="overlay" id="sheetGroupAdmin" onclick="sheetOutside(event,'sheetGroupAdmin')">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">⚙️ Admin Controls</div>
+    <div id="adminContent"></div>
+    <button class="btn ghost" onclick="closeSheet('sheetGroupAdmin')" style="width:100%;margin-top:12px">Close</button>
+  </div>
+</div>
+
+<style>
+.rem-day-btn{min-width:38px;font-size:11px!important}
+.rem-day-btn.active-day{background:var(--accent)!important;color:#fff!important;border-color:var(--accent)!important}
+</style>
+
+<script>
+// ============================================================
+// CONFIG & STATE
+// ============================================================
+const SK = 'vitalize_v5';
+let S = {
+  members:[],uid:null,goals:[],
+  data:{},         // {uid:{steps:{date:n},checks:{date:{gid:bool}},goal:n}}
+  groups:{},       // {gid:{id,name,emoji,adminUid,members:[uid],inviteCode,challenge?,chat:[]}}
+  reminders:[]     // [{id,label,time,days:[0-6],enabled}]
+};
+
+const today=()=>new Date().toISOString().split('T')[0];
+const fmt=n=>n>=1000?(n/1000).toFixed(1)+'k':String(n||0);
+const initials=name=>name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+const COLORS=['#2d9e2d','#2563eb','#d4a017','#e53e3e','#7c3aed','#0891b2'];
+const EMOJIS=['🏃','💪','🔥','⚡','🌿','🎯','🏋️','🚴','🧘','🏊'];
+let currentGroupId=null;
+
+function ud(uid){uid=uid||S.uid;if(!uid)return null;if(!S.data[uid])S.data[uid]={steps:{},checks:{},goal:10000};return S.data[uid]}
+function cu(){return S.members.find(m=>m.id===S.uid)}
+function memberName(uid){return S.members.find(m=>m.id===uid)?.name||'Unknown'}
+
+// ============================================================
+// PERSISTENCE (shared across all users via window.storage)
+// ============================================================
+async function save(){
+  const j=JSON.stringify(S);
+  try{await window.storage.set(SK,j,true)}catch(_){}
+  try{localStorage.setItem(SK,j)}catch(_){}
+}
+async function load(){
+  try{const r=await window.storage.get(SK,true);if(r?.value){S=JSON.parse(r.value);return}}catch(_){}
+  try{const ls=localStorage.getItem(SK);if(ls){S=JSON.parse(ls)}}catch(_){}
+}
+
+// Poll for updates every 15 seconds (sync between users)
+setInterval(async()=>{
+  const prev=JSON.stringify(S);
+  await load();
+  if(JSON.stringify(S)!==prev)render();
+},15000);
+
+// ============================================================
+// URL-BASED GROUP JOIN (auto-join when link is clicked)
+// ============================================================
+function checkUrlGroupJoin(){
+  const params=new URLSearchParams(location.search);
+  const joinGid=params.get('join');
+  if(!joinGid)return;
+  // Remove param from URL without reload
+  const url=new URL(location.href);
+  url.searchParams.delete('join');
+  history.replaceState({},'',url);
+  // Store pending join
+  window._pendingGroupJoin=joinGid;
+}
+
+function applyPendingGroupJoin(){
+  const gid=window._pendingGroupJoin;
+  if(!gid||!S.uid)return;
+  window._pendingGroupJoin=null;
+  const g=S.groups[gid];
+  if(!g){toast('Group not found or expired');return}
+  if(g.members.includes(S.uid)){toast('Already in "'+g.name+'"!');return}
+  g.members.push(S.uid);
+  save();renderGroupsList();
+  toast('Joined "'+g.name+'"! 🎉');
+  setTimeout(()=>{switchPage(2);openGroupDetail(gid)},500);
+}
+
+function getGroupInviteLink(gid){
+  const url=new URL(location.href);
+  url.searchParams.set('join',gid);
+  return url.toString();
+}
+
+// ============================================================
+// REMINDERS
+// ============================================================
+function toggleDay(btn){btn.classList.toggle('active-day')}
+
+async function addReminder(){
+  const label=document.getElementById('remLabel').value.trim()||'Vitalize Reminder';
+  const time=document.getElementById('remTime').value;
+  if(!time){toast('Select a time');return}
+  const days=[...document.querySelectorAll('.rem-day-btn.active-day')].map(b=>parseInt(b.dataset.day));
+  if(!days.length){toast('Select at least one day');return}
+
+  // Request notification permission
+  if('Notification' in window&&Notification.permission==='default'){
+    await Notification.requestPermission();
+  }
+
+  const id='rem'+Date.now();
+  S.reminders.push({id,label,time,days,enabled:true});
+  document.getElementById('remLabel').value='';
+  closeSheet('sheetReminder');
+  await save();renderReminders();scheduleReminders();
+  toast('Reminder set for '+time+' 🔔');
+}
+
+async function deleteReminder(id){
+  S.reminders=S.reminders.filter(r=>r.id!==id);
+  await save();renderReminders();scheduleReminders();
+}
+
+async function toggleReminder(id){
+  const r=S.reminders.find(x=>x.id===id);
+  if(r)r.enabled=!r.enabled;
+  await save();renderReminders();scheduleReminders();
+}
+
+function renderReminders(){
+  const el=document.getElementById('remindersList');
+  if(!S.reminders.length){el.innerHTML='<div class="empty" style="padding:12px 0">No reminders set.</div>';return}
+  const dayNames=['Su','Mo','Tu','We','Th','Fr','Sa'];
+  el.innerHTML=S.reminders.map(r=>`
+    <div class="reminder-row">
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:600;color:var(--text)">${r.label}</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:2px">${r.time} · ${r.days.map(d=>dayNames[d]).join(', ')}</div>
+      </div>
+      <label class="toggle" style="margin-right:10px">
+        <input type="checkbox" ${r.enabled?'checked':''} onchange="toggleReminder('${r.id}')">
+        <span class="slider"></span>
+      </label>
+      <button class="del-btn" onclick="deleteReminder('${r.id}')">×</button>
+    </div>`).join('');
+}
+
+function scheduleReminders(){
+  // Clear old intervals
+  if(window._reminderIntervals)window._reminderIntervals.forEach(clearInterval);
+  window._reminderIntervals=[];
+  if(!('Notification' in window)||Notification.permission!=='granted')return;
+  S.reminders.filter(r=>r.enabled).forEach(r=>{
+    const interval=setInterval(()=>{
+      const now=new Date();
+      const [h,m]=r.time.split(':').map(Number);
+      if(now.getHours()===h&&now.getMinutes()===m&&r.days.includes(now.getDay())){
+        new Notification('Vitalize 🌿',{body:r.label,icon:'/favicon.ico'});
+      }
+    },60000);
+    window._reminderIntervals.push(interval);
+  });
+}
+
+// ============================================================
+// ACTIONS — MEMBERS & STEPS
+// ============================================================
+async function logSteps(){
+  if(!S.uid){toast('Select a profile first');return}
+  const val=parseInt(document.getElementById('stepsInput').value);
+  if(!val||val<0){toast('Enter valid steps');return}
+  const d=ud();const t=today();d.steps[t]=(d.steps[t]||0)+val;
+  document.getElementById('stepsInput').value='';
+  await save();render();toast('+'+val.toLocaleString()+' steps logged! 💪');
+}
+async function setGoal(){
+  if(!S.uid){toast('Select a profile first');return}
+  const val=parseInt(document.getElementById('goalInput').value);
+  if(!val||val<100){toast('Min 100 steps');return}
+  ud().goal=val;document.getElementById('goalInput').value='';
+  await save();render();toast('Daily goal: '+val.toLocaleString()+' steps');
+}
+async function addMember(){
+  const name=document.getElementById('mName').value.trim();
+  const email=document.getElementById('mEmail').value.trim();
+  if(!name){toast('Enter a name');return}
+  if(!email.includes('@')){toast('Enter valid email');return}
+  const id='u'+Date.now();S.members.push({id,name,email});
+  if(!S.uid)S.uid=id;
+  document.getElementById('mName').value='';document.getElementById('mEmail').value='';
+  closeSheet('sheetAddMember');await save();render();toast(name+' added! 🎉');
+  applyPendingGroupJoin();
+}
+async function deleteMember(id){
+  if(!confirm('Remove this member?'))return;
+  S.members=S.members.filter(m=>m.id!==id);delete S.data[id];
+  Object.values(S.groups).forEach(g=>{g.members=g.members.filter(m=>m!==id)});
+  if(S.uid===id)S.uid=S.members[0]?.id||null;
+  await save();render();
+}
+function switchUser(id){
+  S.uid=id;save();closeSheet('sheetUser');render();
+  toast('Switched to '+memberName(id));
+  applyPendingGroupJoin();
+}
+async function addGoal(){
+  const text=document.getElementById('gText').value.trim();
+  if(!text){toast('Enter goal text');return}
+  S.goals.push({id:'g'+Date.now(),text});
+  document.getElementById('gText').value='';closeSheet('sheetGoal');
+  await save();render();toast('Goal added!');
+}
+async function deleteGoal(gid){S.goals=S.goals.filter(g=>g.id!==gid);await save();render()}
+async function toggleGoal(gid){
+  if(!S.uid){toast('Select a profile first');return}
+  const d=ud();const t=today();
+  if(!d.checks[t])d.checks[t]={};
+  d.checks[t][gid]=!d.checks[t][gid];
+  await save();render();
+}
+function copyLink(){navigator.clipboard.writeText(location.href).then(()=>toast('Link copied! 📋')).catch(()=>toast('URL: '+location.href))}
+
+// ============================================================
+// GROUPS
+// ============================================================
+function genCode(){const c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';return Array.from({length:6},()=>c[Math.floor(Math.random()*c.length)]).join('')}
+
+async function createGroup(){
+  if(!S.uid){toast('Select a profile first');return}
+  const name=document.getElementById('cgName').value.trim();
+  if(!name){toast('Enter group name');return}
+  const emoji=document.getElementById('cgEmoji').value.trim()||EMOJIS[Math.floor(Math.random()*EMOJIS.length)];
+  const challengeName=document.getElementById('cgChallengeName').value.trim();
+  const days=parseInt(document.getElementById('cgDays').value)||0;
+  const prize=document.getElementById('cgPrize').value.trim();
+  const type=document.getElementById('cgChallengeType').value;
+  const gid='grp'+Date.now();const code=genCode();
+  const group={id:gid,name,emoji,adminUid:S.uid,members:[S.uid],inviteCode:code,chat:[]};
+  if(challengeName&&days>0){
+    const endDate=new Date();endDate.setDate(endDate.getDate()+days);
+    group.challenge={name:challengeName,type,prize,startDate:today(),endDate:endDate.toISOString().split('T')[0],days};
+  }
+  S.groups[gid]=group;
+  ['cgName','cgEmoji','cgChallengeName','cgDays','cgPrize'].forEach(id=>document.getElementById(id).value='');
+  closeSheet('sheetCreateGroup');await save();renderGroupsList();
+  toast('Group "'+name+'" created! 🎉');
+  setTimeout(()=>openGroupDetail(gid),300);
+}
+
+async function joinGroup(){
+  if(!S.uid){toast('Select a profile first');return}
+  const code=document.getElementById('joinCode').value.trim().toUpperCase();
+  if(code.length!==6){toast('Enter 6-character code');return}
+  const group=Object.values(S.groups).find(g=>g.inviteCode===code);
+  if(!group){toast('Code not found — ask admin to share the link instead');return}
+  if(group.members.includes(S.uid)){toast('Already in "'+group.name+'"!');return}
+  group.members.push(S.uid);
+  document.getElementById('joinCode').value='';
+  closeSheet('sheetJoinGroup');await save();renderGroupsList();
+  toast('Joined "'+group.name+'"! 🎉');
+  setTimeout(()=>openGroupDetail(group.id),300);
+}
+
+async function leaveGroup(gid){
+  if(!confirm('Leave this group?'))return;
+  const g=S.groups[gid];
+  g.members=g.members.filter(m=>m!==S.uid);
+  if(g.adminUid===S.uid&&g.members.length>0)g.adminUid=g.members[0];
+  if(g.members.length===0)delete S.groups[gid];
+  await save();closeGroupDetail();renderGroupsList();toast('Left group');
+}
+
+async function deleteGroup(gid){
+  if(!confirm('Delete this group for everyone? This cannot be undone.'))return;
+  delete S.groups[gid];await save();closeGroupDetail();renderGroupsList();toast('Group deleted');
+}
+
+async function removeFromGroup(gid,uid){
+  if(!confirm('Remove '+memberName(uid)+' from group?'))return;
+  const g=S.groups[gid];g.members=g.members.filter(m=>m!==uid);
+  await save();renderGroupDetail(gid);toast(memberName(uid)+' removed');
+}
+
+async function makeAdmin(gid,uid){
+  if(!confirm('Make '+memberName(uid)+' the admin?'))return;
+  S.groups[gid].adminUid=uid;
+  await save();renderGroupDetail(gid);closeSheet('sheetGroupAdmin');toast(memberName(uid)+' is now admin');
+}
+
+async function sendChat(gid){
+  if(!S.uid){toast('Select a profile first');return}
+  const inp=document.getElementById('chatInput_'+gid);if(!inp)return;
+  const text=inp.value.trim();if(!text)return;
+  const g=S.groups[gid];if(!g)return;
+  g.chat.push({uid:S.uid,text,ts:Date.now()});
+  inp.value='';await save();renderChat(gid);
+}
+
+// ============================================================
+// RENDER GROUPS
+// ============================================================
+function myGroups(){return Object.values(S.groups).filter(g=>g.members.includes(S.uid||''))}
+
+function renderGroupsList(){
+  const groups=myGroups();
+  const el=document.getElementById('groupsList');
+  if(!groups.length){
+    el.innerHTML='<div class="card"><div class="empty">No groups yet!<br><br>Create a group or join one with an invite code.<br><br>💡 <strong>Tip:</strong> Once created, share the group link — anyone who taps it gets added automatically!</div></div>';
+    return;
+  }
+  el.innerHTML=groups.map(g=>{
+    const t=today();
+    const topUid=[...g.members].sort((a,b)=>(S.data[b]?.steps[t]||0)-(S.data[a]?.steps[t]||0))[0];
+    const topSteps=S.data[topUid]?.steps[t]||0;
+    const chal=g.challenge;
+    const daysLeft=chal?Math.max(0,Math.ceil((new Date(chal.endDate)-new Date())/(1000*60*60*24))):0;
+    return `<div class="group-card ${chal?'has-challenge':''}" onclick="openGroupDetail('${g.id}')">
+      <div class="group-card-header">
+        <div class="group-icon">${g.emoji}</div>
+        <div style="flex:1;min-width:0">
+          <div class="group-name">${g.name}</div>
+          <div class="group-meta">${g.members.length} members${g.adminUid===S.uid?' · <strong>You are admin</strong>':''}</div>
+        </div>
+        ${chal?`<span class="tag purple-tag">⚡ ${daysLeft>0?daysLeft+'d left':'Ended'}</span>`:''}
+      </div>
+      ${chal?`<div style="font-size:11px;color:var(--purple);margin-bottom:6px;font-weight:600">${chal.name}${chal.prize?' 🏆 '+chal.prize:''}</div>`:''}
+      <div class="group-stats">
+        <span class="group-stat">Leader today: <strong>${memberName(topUid)} — ${fmt(topSteps)} steps</strong></span>
+        <span class="group-stat">${g.chat.length} messages</span>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Home preview
+  const hg=document.getElementById('homeGroupsCard');
+  const hp=document.getElementById('homeGroupsPreview');
+  if(groups.length>0){
+    hg.style.display='';
+    hp.innerHTML=groups.slice(0,2).map(g=>{
+      const t=today();
+      const topUid=[...g.members].sort((a,b)=>(S.data[b]?.steps[t]||0)-(S.data[a]?.steps[t]||0))[0];
+      return `<div style="display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:1px solid var(--border);cursor:pointer" onclick="switchPage(2);setTimeout(()=>openGroupDetail('${g.id}'),100)">
+        <div style="font-size:18px">${g.emoji}</div>
+        <div style="flex:1"><div style="font-size:13px;font-weight:600">${g.name}</div><div style="font-size:10px;color:var(--text-muted)">Leader: ${memberName(topUid)}</div></div>
+        <span style="font-size:12px;color:var(--accent);font-weight:700">${fmt(S.data[topUid]?.steps[t]||0)}</span>
+      </div>`;
+    }).join('');
+  }else{hg.style.display='none'}
+}
+
+function openGroupDetail(gid){
+  currentGroupId=gid;
+  document.getElementById('groupsListView').style.display='none';
+  document.getElementById('groupDetailView').style.display='block';
+  renderGroupDetail(gid);
+}
+function closeGroupDetail(){
+  currentGroupId=null;
+  document.getElementById('groupsListView').style.display='';
+  document.getElementById('groupDetailView').style.display='none';
+}
+
+function renderGroupDetail(gid){
+  const g=S.groups[gid];if(!g)return;
+  const t=today();const isAdmin=g.adminUid===S.uid;
+
+  // Leaderboard
+  const sorted=[...g.members].sort((a,b)=>(S.data[b]?.steps[t]||0)-(S.data[a]?.steps[t]||0));
+  const lbHtml=sorted.map((uid,i)=>{
+    const m=S.members.find(x=>x.id===uid);if(!m)return '';
+    const steps=S.data[uid]?.steps[t]||0;const goal=S.data[uid]?.goal||10000;
+    const pct=Math.min(100,Math.round(steps/goal*100));
+    const medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':'';
+    return `<div class="lb-row" onclick="openMemberProfile('${uid}')">
+      <div class="rank ${i<3?'top':''}">${medal||i+1}</div>
+      <div class="avatar">${initials(m.name)}</div>
+      <div class="mb-info">
+        <div class="mb-name">${m.name}${uid===S.uid?' <span class="tag">you</span>':''}</div>
+        <div style="margin-top:3px"><div class="prog-wrap dark"><div class="prog-fill dark" style="width:${pct}%;background:${COLORS[i%COLORS.length]}"></div></div></div>
+      </div>
+      <div class="mb-steps">${steps.toLocaleString()}</div>
+    </div>`;
+  }).join('');
+
+  // Challenge
+  let challengeHtml='';
+  const chal=g.challenge;
+  if(chal){
+    const daysLeft=Math.max(0,Math.ceil((new Date(chal.endDate)-new Date())/(1000*60*60*24)));
+    const now=new Date();
+    const memberData=g.members.map(uid=>{
+      const d=S.data[uid];let val=0;
+      if(d){
+        const s=new Date(chal.startDate);
+        for(let dd=new Date(s);dd<=now&&dd<=new Date(chal.endDate);dd.setDate(dd.getDate()+1)){
+          const ds=dd.toISOString().split('T')[0];
+          if(chal.type==='steps')val+=d.steps[ds]||0;
+          else{const checks=d.checks[ds]||{};if(S.goals.length>0&&S.goals.every(g=>checks[g.id]))val++;}
+        }
+      }
+      return {uid,val};
+    }).sort((a,b)=>b.val-a.val);
+    const maxV=Math.max(...memberData.map(x=>x.val),1);
+    const progressHtml=memberData.map((x,i)=>{
+      const m=S.members.find(mm=>mm.id===x.uid);if(!m)return '';
+      const medal=i===0?'🥇 ':i===1?'🥈 ':i===2?'🥉 ':'';
+      return `<div class="ch-member-row">
+        <div class="ch-name">${medal}${m.name.split(' ')[0]}</div>
+        <div class="ch-bar-wrap"><div class="ch-bar" style="width:${Math.round(x.val/maxV*100)}%"></div></div>
+        <div class="ch-val">${chal.type==='steps'?fmt(x.val):x.val+'d'}</div>
+      </div>`;
+    }).join('');
+    challengeHtml=`<div class="challenge-card">
+      <div class="challenge-title">⚡ ${chal.name}</div>
+      <div class="challenge-meta">${chal.type==='steps'?'Most total steps wins':'Days with all goals completed'} · ${daysLeft>0?daysLeft+' days left':'Challenge ended!'}</div>
+      ${chal.prize?`<div class="challenge-prize">🏆 Prize: ${chal.prize}</div>`:''}
+      <div>${progressHtml}</div>
+    </div>`;
+  }
+
+  // Invite / Share
+  const inviteLink=getGroupInviteLink(gid);
+  const shareHtml=`<div class="card soft-green">
+    <div class="sec">Invite People</div>
+    <p style="font-size:12px;color:var(--text-dim);margin-bottom:10px;line-height:1.6">
+      📎 <strong>Share Link</strong> — anyone who opens this link gets added to the group automatically!<br>
+      🔑 Or share the invite code: <span style="font-family:monospace;font-size:14px;font-weight:800;color:var(--accent);letter-spacing:3px">${g.inviteCode}</span>
+    </p>
+    <div class="share-url-box">${inviteLink}</div>
+    <div style="display:flex;gap:8px">
+      <button class="btn" onclick="copyGroupLink('${gid}')" style="flex:1">📋 Copy Invite Link</button>
+      ${isAdmin?`<button class="btn ghost sm" onclick="openGroupAdmin('${gid}')">⚙️ Admin</button>`:''}
+    </div>
+  </div>`;
+
+  // Chat
+  const chatHtml=`<div class="card">
+    <div class="sec">Group Chat (${g.chat.length})</div>
+    <div class="chat-area" id="chatArea_${gid}"></div>
+    <div class="chat-input-row">
+      <textarea class="chat-input" id="chatInput_${gid}" placeholder="Send a message…" rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat('${gid}')}"></textarea>
+      <button class="chat-send" onclick="sendChat('${gid}')">➤</button>
+    </div>
+  </div>`;
+
+  const leaveHtml=`<button class="btn ghost sm" onclick="leaveGroup('${gid}')" style="margin-bottom:12px">Leave Group</button>`;
+
+  document.getElementById('groupDetailContent').innerHTML=`
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+      <div style="font-size:34px">${g.emoji}</div>
+      <div>
+        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:19px;color:var(--text)">${g.name}</div>
+        <div style="font-size:11px;color:var(--text-muted)">${g.members.length} members · ${isAdmin?'You are admin':'Joined'}</div>
+      </div>
+    </div>
+    ${challengeHtml}
+    <div class="card"><div class="sec">Today's Leaderboard</div>${lbHtml||'<div class="empty">No data yet</div>'}</div>
+    ${shareHtml}
+    ${chatHtml}
+    ${leaveHtml}`;
+  renderChat(gid);
+}
+
+function renderChat(gid){
+  const g=S.groups[gid];if(!g)return;
+  const area=document.getElementById('chatArea_'+gid);if(!area)return;
+  if(!g.chat.length){area.innerHTML='<div class="empty" style="padding:14px 0;font-size:12px">No messages yet. Say hi! 👋</div>';return}
+  area.innerHTML=g.chat.slice(-60).map(msg=>{
+    const mine=msg.uid===S.uid;
+    const name=memberName(msg.uid).split(' ')[0];
+    const time=new Date(msg.ts).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+    return `<div class="chat-msg ${mine?'mine':'theirs'}">
+      ${!mine?`<div class="chat-sender">${name}</div>`:''}
+      <div class="chat-bubble">${msg.text}</div>
+      <div class="chat-time">${time}</div>
+    </div>`;
+  }).join('');
+  area.scrollTop=area.scrollHeight;
+}
+
+function copyGroupLink(gid){
+  const link=getGroupInviteLink(gid);
+  navigator.clipboard.writeText(link).then(()=>toast('Group link copied! Share via WhatsApp 📋'));
+}
+
+// Admin panel
+function openGroupAdmin(gid){
+  const g=S.groups[gid];if(!g)return;
+  const el=document.getElementById('adminContent');
+  el.innerHTML=`
+    <div class="sec">Members (${g.members.length})</div>
+    <div style="margin-bottom:14px">
+      ${g.members.map(uid=>{
+        const m=S.members.find(x=>x.id===uid);if(!m)return '';
+        return `<div class="admin-member-row">
+          <div class="avatar">${initials(m.name)}</div>
+          <div style="flex:1"><div style="font-size:13px;font-weight:600">${m.name}</div><div style="font-size:10px;color:var(--text-muted)">${m.email}${uid===g.adminUid?' · Admin':''}</div></div>
+          ${uid!==S.uid&&uid!==g.adminUid?`<button class="btn xs ghost" onclick="makeAdmin('${gid}','${uid}');closeSheet('sheetGroupAdmin')" style="margin-right:6px">Make Admin</button><button class="btn xs danger" onclick="removeFromGroup('${gid}','${uid}')">Remove</button>`:''}
+        </div>`;
+      }).join('')}
+    </div>
+    <div class="sep"></div>
+    <button class="btn danger sm" onclick="deleteGroup('${gid}');closeSheet('sheetGroupAdmin')" style="width:100%">🗑️ Delete Group for Everyone</button>`;
+  openSheet('sheetGroupAdmin');
+}
+
+// ============================================================
+// RENDER — HOME / GOALS / LEADERBOARD
+// ============================================================
+function render(){
+  renderTopBar();renderSteps();renderStats();renderWeek();
+  renderGoals();renderHomeGoals();renderMonthCal();
+  renderLeaderboard();renderCompare();renderWinner();
+  renderDate();renderShareUrl();renderGroupsList();renderReminders();
+  if(currentGroupId)renderGroupDetail(currentGroupId);
+}
+
+function renderTopBar(){const u=cu();document.getElementById('topAvatar').textContent=u?initials(u.name):'?';document.getElementById('topName').textContent=u?.name||'Select user'}
+
+function renderSteps(){
+  const d=ud();const t=today();const steps=d?.steps[t]||0;const goal=d?.goal||10000;
+  const pct=Math.min(100,steps/goal*100);const circ=2*Math.PI*37;
+  document.getElementById('stepsNum').textContent=steps.toLocaleString();
+  document.getElementById('stepsGoalLbl').textContent=goal.toLocaleString();
+  document.getElementById('stepsPctLbl').textContent=Math.round(pct)+'% complete';
+  document.getElementById('stepsProgBar').style.width=pct+'%';
+  document.getElementById('ringFill').style.strokeDashoffset=circ-(circ*pct/100);
+}
+
+function renderStats(){
+  const d=ud();let streak=0;
+  if(d){const goal=d.goal||10000;const check=new Date();for(let i=0;i<365;i++){const s=check.toISOString().split('T')[0];if((d.steps[s]||0)>=goal){streak++;check.setDate(check.getDate()-1)}else if(i===0){check.setDate(check.getDate()-1)}else break}}
+  const weekSteps=getWeekDates().reduce((s,dt)=>s+(d?.steps[dt]||0),0);
+  const checks=d?.checks[today()]||{};const done=S.goals.filter(g=>checks[g.id]).length;
+  document.getElementById('streakVal').textContent=streak;
+  document.getElementById('weekVal').textContent=fmt(weekSteps);
+  document.getElementById('goalsDoneVal').textContent=done+'/'+S.goals.length;
+}
+
+function getWeekDates(){const now=new Date();const day=now.getDay();return Array.from({length:7},(_,i)=>{const d=new Date(now);d.setDate(now.getDate()-day+i);return d.toISOString().split('T')[0]})}
+
+function renderWeek(){
+  const d=ud();const dates=getWeekDates();const t=today();const goal=d?.goal||10000;
+  const maxS=Math.max(goal,...dates.map(dt=>d?.steps[dt]||0),1);
+  const labels=['S','M','T','W','T','F','S'];
+  document.getElementById('weekGrid').innerHTML=dates.map((dt,i)=>{
+    const s=d?.steps[dt]||0;const h=Math.round(s/maxS*100);const hit=s>=goal;
+    return `<div class="day-col ${dt===t?'is-today':''}">
+      <div class="day-lbl">${labels[i]}</div>
+      <div class="day-bar-track"><div class="day-bar${hit?' hit':''}" style="height:${h}%"></div></div>
+      <div class="day-num">${s?fmt(s):''}</div>
+    </div>`;
+  }).join('');
+}
+
+function goalsHtml(listId){
+  const checks=ud()?.checks[today()]||{};
+  if(!S.goals.length)return'<div class="empty" style="padding:14px 0">No goals yet. Tap <strong>＋ Add</strong>!</div>';
+  return S.goals.map(g=>{
+    const done=checks[g.id]||false;
+    let streak=0;const d=ud();
+    if(d){const check=new Date();for(let i=0;i<90;i++){const s=check.toISOString().split('T')[0];if(d.checks[s]?.[g.id]){streak++;check.setDate(check.getDate()-1)}else if(i===0){check.setDate(check.getDate()-1)}else break}}
+    return `<div class="goal-row ${done?'checked':''}">
+      <div class="check-box" onclick="toggleGoal('${g.id}')">${done?'✓':''}</div>
+      <div class="goal-text">${g.text}</div>
+      ${streak>1?`<span class="goal-streak">🔥${streak}</span>`:''}
+      <button class="del-btn" onclick="deleteGoal('${g.id}')">×</button>
+    </div>`;
+  }).join('');
+}
+function renderGoals(){const el=document.getElementById('goalsList');if(el)el.innerHTML=goalsHtml('goalsList')}
+function renderHomeGoals(){const el=document.getElementById('homeGoalsList');if(el)el.innerHTML=goalsHtml('homeGoalsList')}
+
+function renderMonthCal(){
+  const now=new Date();const year=now.getFullYear();const month=now.getMonth();const todayS=today();const d=ud();
+  const firstDay=new Date(year,month,1).getDay();const daysInMonth=new Date(year,month+1,0).getDate();
+  document.getElementById('calHeader').innerHTML=['Su','Mo','Tu','We','Th','Fr','Sa'].map(d=>`<div class="cal-h">${d}</div>`).join('');
+  let html=Array(firstDay).fill('<div class="cal-day"></div>').join('');
+  for(let day=1;day<=daysInMonth;day++){
+    const ds=year+'-'+String(month+1).padStart(2,'0')+'-'+String(day).padStart(2,'0');
+    const isFuture=ds>todayS;const isToday=ds===todayS;
+    let cls='cal-day';
+    if(isFuture)cls+=' future';
+    else if(S.goals.length>0){const checks=d?.checks[ds]||{};const done=S.goals.filter(g=>checks[g.id]).length;if(done===S.goals.length)cls+=' all-done';else if(done>0)cls+=' partial';else cls+=' none-done'}
+    if(isToday)cls+=' is-today';
+    html+=`<div class="${cls}">${day}</div>`;
+  }
+  document.getElementById('monthCal').innerHTML=html;
+}
+
+function renderLeaderboard(){
+  const t=today();const sorted=[...S.members].sort((a,b)=>(S.data[b.id]?.steps[t]||0)-(S.data[a.id]?.steps[t]||0));
+  const el=document.getElementById('leaderboard');
+  if(!sorted.length){el.innerHTML='<div class="empty">No members yet.</div>';return}
+  el.innerHTML=sorted.map((m,i)=>{
+    const steps=S.data[m.id]?.steps[t]||0;const goal=S.data[m.id]?.goal||10000;
+    const pct=Math.min(100,Math.round(steps/goal*100));const medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':'';
+    return `<div class="lb-row" onclick="openMemberProfile('${m.id}')">
+      <div class="rank ${i<3?'top':''}">${medal||i+1}</div>
+      <div class="avatar">${initials(m.name)}</div>
+      <div class="mb-info">
+        <div class="mb-name">${m.name}${m.id===S.uid?' <span class="tag">you</span>':''}</div>
+        <div class="mb-email">${m.email}</div>
+        <div style="margin-top:3px"><div class="prog-wrap dark"><div class="prog-fill dark" style="width:${pct}%;background:${COLORS[i%COLORS.length]}"></div></div></div>
+      </div>
+      <div><div class="mb-steps">${steps.toLocaleString()}</div><div style="font-size:9px;color:var(--text-muted)">${pct}%</div></div>
+      ${m.id!==S.uid?`<button class="mb-del" onclick="event.stopPropagation();deleteMember('${m.id}')">×</button>`:''}
+    </div>`;
+  }).join('');
+}
+
+function renderCompare(){
+  const dates=getWeekDates();const labels=['S','M','T','W','T','F','S'];const members=S.members.slice(0,6);
+  if(!members.length){document.getElementById('compareGrid').innerHTML='<div class="empty" style="grid-column:1/-1">No members</div>';return}
+  const allVals=members.flatMap(m=>dates.map(dt=>S.data[m.id]?.steps[dt]||0));const maxV=Math.max(...allVals,1);
+  document.getElementById('compareGrid').innerHTML=dates.map((dt,di)=>`<div class="cmp-col"><div class="cmp-lbl">${labels[di]}</div><div class="cmp-track">${members.map((m,mi)=>`<div class="cmp-bar c${mi}" style="height:${Math.round((S.data[m.id]?.steps[dt]||0)/maxV*100)}%"></div>`).join('')}</div></div>`).join('');
+  document.getElementById('cmpLegend').innerHTML=members.map((m,i)=>`<div class="cmp-leg-item"><div class="cmp-leg-dot c${i}"></div>${m.name.split(' ')[0]}</div>`).join('');
+}
+
+function renderWinner(){
+  const dates=getWeekDates();
+  if(!S.members.length){document.getElementById('winnerBanner').style.display='none';return}
+  const totals=S.members.map(m=>({m,total:dates.reduce((s,dt)=>s+(S.data[m.id]?.steps[dt]||0),0)})).sort((a,b)=>b.total-a.total);
+  const w=totals[0];
+  if(!w||w.total===0){document.getElementById('winnerBanner').style.display='none';return}
+  document.getElementById('winnerBanner').style.display='flex';
+  document.getElementById('winnerTitle').textContent='🏆 Week Leader: '+w.m.name.split(' ')[0]+'!';
+  document.getElementById('winnerSub').textContent=w.total.toLocaleString()+' steps this week';
+}
+
+function renderDate(){const now=new Date();const m=document.getElementById('monthTitle');if(m)m.textContent=now.toLocaleDateString('en-US',{month:'long',year:'numeric'})}
+function renderShareUrl(){const el=document.getElementById('shareUrlBox');if(el)el.textContent=location.href}
+
+function renderUserSheet(){
+  const el=document.getElementById('profileList');
+  if(!S.members.length){el.innerHTML='<div class="empty">No members yet.</div>';return}
+  el.innerHTML=S.members.map(m=>`
+    <div onclick="switchUser('${m.id}')" style="display:flex;align-items:center;gap:9px;cursor:pointer;background:${m.id===S.uid?'var(--accent-light)':'var(--surface2)'};border-radius:11px;padding:10px 12px;border:1.5px solid ${m.id===S.uid?'var(--accent-dim)':'var(--border)'}">
+      <div class="avatar">${initials(m.name)}</div>
+      <div style="flex:1"><div style="font-size:13px;font-weight:600;color:var(--text)">${m.name}</div><div style="font-size:10px;color:var(--text-muted)">${m.email}</div></div>
+      ${m.id===S.uid?'<div style="color:var(--accent);font-weight:800">✓</div>':''}
+    </div>`).join('');
+}
+
+function openMemberProfile(uid){
+  const m=S.members.find(x=>x.id===uid);if(!m)return;
+  const d=S.data[uid];const t=today();
+  const steps=d?.steps[t]||0;const goal=d?.goal||10000;const pct=Math.min(100,Math.round(steps/goal*100));
+  const weekSteps=getWeekDates().reduce((s,dt)=>s+(d?.steps[dt]||0),0);
+  let streak=0;if(d){const check=new Date();for(let i=0;i<365;i++){const s=check.toISOString().split('T')[0];if((d.steps[s]||0)>=goal){streak++;check.setDate(check.getDate()-1)}else if(i===0){check.setDate(check.getDate()-1)}else break}}
+  const checks=d?.checks[t]||{};const done=S.goals.filter(g=>checks[g.id]).length;
+  document.getElementById('profileContent').innerHTML=
+    `<div class="profile-hero"><div class="avatar lg">${initials(m.name)}</div><div><div style="font-family:'Syne',sans-serif;font-weight:700;font-size:18px;color:var(--text)">${m.name}</div><div style="font-size:10px;color:var(--text-muted)">${m.email}</div><div style="margin-top:4px"><span class="tag">${pct}% of today's goal</span></div></div></div>`+
+    `<div class="profile-stats"><div class="profile-stat"><div class="profile-stat-val" style="color:var(--accent)">${steps.toLocaleString()}</div><div class="profile-stat-lbl">Today</div></div><div class="profile-stat"><div class="profile-stat-val" style="color:var(--gold)">${streak}</div><div class="profile-stat-lbl">🔥 Streak</div></div><div class="profile-stat"><div class="profile-stat-val" style="color:var(--blue)">${fmt(weekSteps)}</div><div class="profile-stat-lbl">Week</div></div></div>`+
+    `<div style="margin-bottom:14px"><div class="prog-wrap dark"><div class="prog-fill dark" style="width:${pct}%"></div></div></div>`+
+    `<div class="sec">Today's Goals (${done}/${S.goals.length})</div>`+
+    (S.goals.map(g=>{const isDone=checks[g.id]||false;return `<div class="gcl-row ${isDone?'done':''}"><div class="gcl-dot">${isDone?'✓':''}</div><div class="gcl-txt">${g.text}</div>${isDone?'<span style="color:var(--accent)">✅</span>':'<span style="color:var(--text-muted)">○</span>'}</div>`}).join('')||'<div class="empty">No goals set</div>');
+  openSheet('sheetProfile');
+}
+
+// ============================================================
+// NAV
+// ============================================================
+const pages=['pageHome','pageGoals','pageGroups','pageLeaderboard'];
+function switchPage(i){
+  pages.forEach((p,j)=>{document.getElementById(p).classList.toggle('active',j===i);document.getElementById('nav'+j).classList.toggle('active',j===i)});
+  if(i===2)renderGroupsList();
+  if(i===3){renderLeaderboard();renderCompare();}
+}
+
+// ============================================================
+// SHEETS
+// ============================================================
+function openSheet(id){if(id==='sheetUser')renderUserSheet();document.getElementById(id).classList.add('open')}
+function closeSheet(id){document.getElementById(id).classList.remove('open')}
+function sheetOutside(e,id){if(e.target.classList.contains('overlay'))closeSheet(id)}
+
+// ============================================================
+// TOAST
+// ============================================================
+function toast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('show'),2800)}
+
+// ============================================================
+// KEYBOARD
+// ============================================================
+document.getElementById('stepsInput').addEventListener('keydown',e=>{if(e.key==='Enter')logSteps()});
+document.getElementById('gText').addEventListener('keydown',e=>{if(e.key==='Enter')addGoal()});
+document.getElementById('mEmail').addEventListener('keydown',e=>{if(e.key==='Enter')addMember()});
+document.getElementById('joinCode').addEventListener('input',e=>{e.target.value=e.target.value.toUpperCase()});
+
+// ============================================================
+// PWA
+// ============================================================
+if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch(()=>{});
+
+// ============================================================
+// INIT
+// ============================================================
+async function init(){
+  checkUrlGroupJoin();
+  await load();
+  render();
+  scheduleReminders();
+  // If there's a pending group join and we have a user, apply it
+  if(window._pendingGroupJoin&&S.uid)applyPendingGroupJoin();
+  else if(window._pendingGroupJoin)toast('Select your profile to join the group!');
+}
+init();
+</script>
+</body>
+</html>
